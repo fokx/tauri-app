@@ -8,6 +8,8 @@
     event.preventDefault();
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     greetMsg = await invoke("greet", { name });
+    greetMsg += await invoke("collect_nic_info");
+
     write(greetMsg);
   }
 
@@ -19,20 +21,19 @@
   async function write(message: string) {
     await writeTextFile('test.txt', message, { baseDir: BaseDirectory.Home });
   }
-  // write("Hello, World!");
-  // onMount(() => {
-  //   window.addEventListener("DOMContentLoaded", () => {
-  //     greetInputEl = document.querySelector("#greet-input");
-  //     document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
-  //       e.preventDefault();
-  //       if (!greetInputEl )
-  //         return;
-  //
-  //       write(greetInputEl.value == "" ? "No input provided": greetInputEl.value);
-  //
-  //     });
-  //   });
-  // });
+
+  import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
+  // when using `"withGlobalTauri": true`, you may use
+  // const { enable, isEnabled, disable } = window.__TAURI__.autostart;
+
+  onMount(async () => {
+    // Enable autostart
+    await enable();
+    // Check enable state
+    console.log(`registered for autostart? ${await isEnabled()}`);
+    // Disable autostart
+    // disable();
+  });
 </script>
 
 <main class="container">
