@@ -1,7 +1,22 @@
 use network_interface::NetworkInterface;
 use network_interface::NetworkInterfaceConfig;
+use futures::{future, StreamExt};
+use tauri::{Emitter, Manager, Url, WebviewUrl};
+use tokio;
 
 use sysinfo::{Components, Disks, Networks, System};
+
+// #[cfg(any(target_os = "android", target_os = "ios"))]
+// use test::Foo;
+
+#[cfg(not(any(target_os = "android", target_os = "ios")))] // desktop
+use tauri_plugin_shell::ShellExt;
+
+#[cfg(not(any(target_os = "android", target_os = "ios")))] // mobile
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::TrayIconBuilder,
+};
 
 #[tauri::command]
 fn collect_nic_info() -> String {
@@ -59,17 +74,40 @@ fn collect_nic_info() -> String {
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
+#[tauri::command]
+fn collect_center_server_ip() -> String {
+    const CENTRAL_SERVER_IP_SRC_URLS: &'static [&'static str] = &[
+        "https://raw.githubusercontent.com/xjtu-men/domains/main/xjtu.men.server.ip",
+        "https://gitea.com/xjtu-men/domains/raw/branch/main/xjtu.men.server.ip",
+    ];
+
+    let client = reqwest::Client::new();
+    let bodies = future::join_all(CENTRAL_SERVER_IP_SRC_URLS.into_iter().map(|url| {
+        let client = &client;
+        async move {
+            let resp = client.get(*url).send().await?;
+            resp.bytes().await
+        }
+    }));
+    let mut result: String = "".to_owned();
+    for body in tauri::async_runtime::block_on(bodies) {
+        result.push_str(&format!("{:?}", body));
+    }
+    return result;
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(any(target_os = "android", target_os = "ios"))]
     {
+        // mobile
         tauri::Builder::default()
             .plugin(tauri_plugin_barcode_scanner::init())
             .plugin(tauri_plugin_biometric::init())
             .plugin(tauri_plugin_nfc::init())
             .plugin(tauri_plugin_notification::init())
             .plugin(tauri_plugin_fs::init())
+                .plugin(tauri_plugin_http::init())
             .plugin(tauri_plugin_opener::init())
             .setup(|app| Ok(()))
             .invoke_handler(tauri::generate_handler![greet, collect_nic_info])
@@ -79,12 +117,74 @@ pub fn run() {
 
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
+        // desktop
         tauri::Builder::default()
+            .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec![]) /* arbitrary number of args to pass to your app */))
+                .plugin(tauri_plugin_shell::init())
+
             .plugin(tauri_plugin_global_shortcut::Builder::new().build())
             .plugin(tauri_plugin_notification::init())
             .plugin(tauri_plugin_fs::init())
+                .plugin(tauri_plugin_http::init())
             .plugin(tauri_plugin_opener::init())
-            .setup(|app| Ok(()))
+            .setup(|app| {
+
+                let handle = app.handle().clone();
+                let shell = handle.shell();
+                let output = tauri::async_runtime::block_on(async move {
+                    shell
+                            .command("echo")
+                            .args(["Hello from Rust!"])
+                            .output()
+                            .await
+                            .unwrap()
+                });
+                if output.status.success() {
+                    println!("Result: {:?}", String::from_utf8(output.stdout));
+                } else {
+                    println!("Exit with code: {}", output.status.code().unwrap());
+                };
+
+                let sidecar_command = app.shell().sidecar("tcc-xapp-mnz").unwrap();
+                let (mut rx, mut _child) = sidecar_command
+                        .spawn()
+                        .expect("Failed to spawn sidecar");
+
+                let window = app.get_window("main").unwrap();
+                // let _ = window.destroy();
+                let window = tauri::window::WindowBuilder::new(app, "webview").build()?;
+                // let title = Config::get().unwrap().title.unwrap_or("xmen app".to_string());
+                // window.set_title("交大門 Tauri App");
+
+                let url = Url::parse("https://myip.xjtu.app:443")?;
+                let webview_builder = tauri::webview::WebviewBuilder::new(
+                    "label", WebviewUrl::External(url))
+                        .proxy_url(Url::parse("socks5://127.0.0.1:4848")?) // may cause white screen
+                        ;
+                let webview = window.add_child( // Available on desktop and crate feature unstable only.
+                                                webview_builder,
+                                                tauri::LogicalPosition::new(0, 0),
+                                                window.inner_size().unwrap(),
+                );
+
+                let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+                let menu = Menu::with_items(app, &[&quit_i])?;
+                let tray = TrayIconBuilder::new()
+                        .menu(&menu)
+                        .show_menu_on_left_click(true)
+                        .on_menu_event(|app, event| match event.id.as_ref() {
+                            "quit" => {
+                                println!("quit menu item was clicked");
+                                app.exit(0);
+                            }
+                            _ => {
+                                println!("menu item {:?} not handled", event.id);
+                            }
+                        })
+                        .build(app)?;
+
+                Ok(())
+            })
             .invoke_handler(tauri::generate_handler![greet, collect_nic_info])
             .run(tauri::generate_context!())
             .expect("error while running tauri application");
