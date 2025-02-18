@@ -1,14 +1,12 @@
 use network_interface::NetworkInterface;
 use network_interface::NetworkInterfaceConfig;
 
-use sysinfo::{
-    Components, Disks, Networks, System,
-};
+use sysinfo::{Components, Disks, Networks, System};
 
 #[tauri::command]
-fn collect_nic_info() ->String {
+fn collect_nic_info() -> String {
     let network_interfaces = NetworkInterface::show().unwrap();
-    let mut result : String = "".to_owned();
+    let mut result: String = "".to_owned();
     for itf in network_interfaces.iter() {
         result.push_str(&format!("{:?}", itf));
     }
@@ -23,16 +21,29 @@ fn collect_nic_info() ->String {
 
     // Display system information:
     result.push_str(&format!("System name:             {:?}", System::name()));
-    result.push_str(&format!("System kernel version:   {:?}", System::kernel_version()));
-    result.push_str(&format!("System OS version:       {:?}", System::os_version()));
-    result.push_str(&format!("System host name:        {:?}", System::host_name()));
+    result.push_str(&format!(
+        "System kernel version:   {:?}",
+        System::kernel_version()
+    ));
+    result.push_str(&format!(
+        "System OS version:       {:?}",
+        System::os_version()
+    ));
+    result.push_str(&format!(
+        "System host name:        {:?}",
+        System::host_name()
+    ));
 
     // Number of CPUs:
     result.push_str(&format!("NB CPUs: {}", sys.cpus().len()));
 
     // Display processes ID, name na disk usage:
     for (pid, process) in sys.processes() {
-        result.push_str(&format!("[{pid}] {:?} {:?}", process.name(), process.disk_usage()));
+        result.push_str(&format!(
+            "[{pid}] {:?} {:?}",
+            process.name(),
+            process.disk_usage()
+        ));
     }
 
     // We display all disks' information:
@@ -51,13 +62,31 @@ fn greet(name: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_opener::init())
-        .setup(|app| {
-            Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![greet, collect_nic_info])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    {
+        tauri::Builder::default()
+            .plugin(tauri_plugin_barcode_scanner::init())
+            .plugin(tauri_plugin_biometric::init())
+            .plugin(tauri_plugin_nfc::init())
+            .plugin(tauri_plugin_notification::init())
+            .plugin(tauri_plugin_fs::init())
+            .plugin(tauri_plugin_opener::init())
+            .setup(|app| Ok(()))
+            .invoke_handler(tauri::generate_handler![greet, collect_nic_info])
+            .run(tauri::generate_context!())
+            .expect("error while running tauri application");
+    }
+
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    {
+        tauri::Builder::default()
+            .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+            .plugin(tauri_plugin_notification::init())
+            .plugin(tauri_plugin_fs::init())
+            .plugin(tauri_plugin_opener::init())
+            .setup(|app| Ok(()))
+            .invoke_handler(tauri::generate_handler![greet, collect_nic_info])
+            .run(tauri::generate_context!())
+            .expect("error while running tauri application");
+    }
 }

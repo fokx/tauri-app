@@ -14,9 +14,24 @@ importers:
       '@tauri-apps/plugin-autostart':
         specifier: ~2.2.0
         version: 2.2.0
+      '@tauri-apps/plugin-barcode-scanner':
+        specifier: ~2
+        version: 2.2.0
+      '@tauri-apps/plugin-biometric':
+        specifier: ~2
+        version: 2.2.0
       '@tauri-apps/plugin-fs':
         specifier: ~2
         version: 2.2.0
+      '@tauri-apps/plugin-global-shortcut':
+        specifier: ~2
+        version: 2.2.0
+      '@tauri-apps/plugin-nfc':
+        specifier: ~2
+        version: 2.2.0
+      '@tauri-apps/plugin-notification':
+        specifier: ~2
+        version: 2.2.1
       '@tauri-apps/plugin-opener':
         specifier: ^2
         version: 2.2.4
@@ -421,8 +436,23 @@ packages:
   '@tauri-apps/plugin-autostart@2.2.0':
     resolution: {integrity: sha512-TzVcDZdOvdot0avkpstUWJKKEl4cyxLpFB9DZZRW5zH8k+Bv8IVJmO0zyYuw+7oKlGdHOINbD/7Je7GHMViw5w==}
 
+  '@tauri-apps/plugin-barcode-scanner@2.2.0':
+    resolution: {integrity: sha512-16AgAjNZGS790KXTW2oq7K0YKUCxLmlDlizN7+pBvIcZzdR3kYzHSST/CYSXkAkYRParyHmE2nMsMvqJFAHKbA==}
+
+  '@tauri-apps/plugin-biometric@2.2.0':
+    resolution: {integrity: sha512-bxetRUGNGIuH/zMMlZ1VuYG7B0pWA/GkNDyMKmajCC3T3AIgL+siyeorDw+lAcp9KDNnTZ8vSOlxiAcwdbWN4Q==}
+
   '@tauri-apps/plugin-fs@2.2.0':
     resolution: {integrity: sha512-+08mApuONKI8/sCNEZ6AR8vf5vI9DXD4YfrQ9NQmhRxYKMLVhRW164vdW5BSLmMpuevftpQ2FVoL9EFkfG9Z+g==}
+
+  '@tauri-apps/plugin-global-shortcut@2.2.0':
+    resolution: {integrity: sha512-clI9Bg/BcxWXNDK+ij601o1qC2WxMEy8ovhGgEW5Ai17oPy0KK8uwzmc59KiVnOYKpBWHCUPqBxG+KBNUFXgzw==}
+
+  '@tauri-apps/plugin-nfc@2.2.0':
+    resolution: {integrity: sha512-ZFfDcpqKwww9qOf37zPfQtEFtsjp9+IJHpvoYXPUG+jf09LRdOrd95rqR9OMPnIijaYGu5q3VEBQivZ5nMVJsw==}
+
+  '@tauri-apps/plugin-notification@2.2.1':
+    resolution: {integrity: sha512-QF8Zod6XDhxD6xkD5nU/BjbOpJ6+3gxGCrVULOdLpvMuMSN2Z2IdObV/qgnrEJk1UamUCF1ClQUqNCbk4zTJNQ==}
 
   '@tauri-apps/plugin-opener@2.2.4':
     resolution: {integrity: sha512-5oXWr80ek8JHwQ/budIdZTHAWBF4XfYMiXIyH8Pr92QtwEG+6xCgCcws0k4xCemVDEetclveJPu8yB9ysuU/dQ==}
@@ -909,7 +939,27 @@ snapshots:
     dependencies:
       '@tauri-apps/api': 2.2.0
 
+  '@tauri-apps/plugin-barcode-scanner@2.2.0':
+    dependencies:
+      '@tauri-apps/api': 2.2.0
+
+  '@tauri-apps/plugin-biometric@2.2.0':
+    dependencies:
+      '@tauri-apps/api': 2.2.0
+
   '@tauri-apps/plugin-fs@2.2.0':
+    dependencies:
+      '@tauri-apps/api': 2.2.0
+
+  '@tauri-apps/plugin-global-shortcut@2.2.0':
+    dependencies:
+      '@tauri-apps/api': 2.2.0
+
+  '@tauri-apps/plugin-nfc@2.2.0':
+    dependencies:
+      '@tauri-apps/api': 2.2.0
+
+  '@tauri-apps/plugin-notification@2.2.1':
     dependencies:
       '@tauri-apps/api': 2.2.0
 
