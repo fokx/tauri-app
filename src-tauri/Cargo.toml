@@ -57,6 +57,7 @@ uuid = { version = "1.13.2", default-features = false, features = ["serde", "std
 dotenvy = "0.15.7"
 dotenvy_macro = "0.15.7"
 url = "2.5.4"
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 #socks5-proto = { path = "../../socks5-server/socks5-proto", default-features = false }
 #socks5-server = { path = "../../socks5-server/socks5-server", default-features = false }
 #tuic = { path = "../../tuic/tuic", default-features = false }

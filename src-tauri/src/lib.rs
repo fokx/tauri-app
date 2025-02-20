@@ -1,6 +1,6 @@
+use futures::{future, StreamExt};
 use network_interface::NetworkInterface;
 use network_interface::NetworkInterfaceConfig;
-use futures::{future, StreamExt};
 use tauri::{Emitter, Manager, WebviewUrl};
 use tokio;
 
@@ -110,7 +110,8 @@ pub fn run() {
             .plugin(tauri_plugin_nfc::init())
             .plugin(tauri_plugin_notification::init())
             .plugin(tauri_plugin_fs::init())
-                .plugin(tauri_plugin_http::init())
+            .plugin(tauri_plugin_sql::Builder::new().build())
+            .plugin(tauri_plugin_http::init())
             .plugin(tauri_plugin_opener::init())
             .setup(|app| Ok(()))
             .invoke_handler(tauri::generate_handler![greet, collect_nic_info])
@@ -123,12 +124,12 @@ pub fn run() {
         // desktop
         tauri::Builder::default()
             // .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec![]) /* arbitrary number of args to pass to your app */))
-                .plugin(tauri_plugin_shell::init())
-
+            .plugin(tauri_plugin_shell::init())
             .plugin(tauri_plugin_global_shortcut::Builder::new().build())
             .plugin(tauri_plugin_notification::init())
             .plugin(tauri_plugin_fs::init())
-                .plugin(tauri_plugin_http::init())
+            .plugin(tauri_plugin_sql::Builder::new().build())
+            .plugin(tauri_plugin_http::init())
             .plugin(tauri_plugin_opener::init())
             .setup(|app| {
                 /* this shell codeb will cause crash on Windows!
@@ -150,9 +151,8 @@ pub fn run() {
                  */
 
                 let sidecar_command = app.shell().sidecar("tcc-xapp-mnz").unwrap();
-                let (mut rx, mut _child) = sidecar_command
-                        .spawn()
-                        .expect("Failed to spawn sidecar");
+                let (mut rx, mut _child) =
+                    sidecar_command.spawn().expect("Failed to spawn sidecar");
 
                 // let window = app.get_window("main").unwrap();
                 // // let _ = window.destroy();
@@ -164,8 +164,8 @@ pub fn run() {
                 // let tauri_url = tauri::WebviewUrl::App("index.html".into());
                 let url = Url::parse("https://myip.xjtu.app:443")?;
                 let tauri_url = WebviewUrl::External(url);
-                let webview_window = tauri::WebviewWindowBuilder::new(app, "label", tauri_url)
-                        .build()?;
+                let webview_window =
+                    tauri::WebviewWindowBuilder::new(app, "label", tauri_url).build()?;
                 // WebviewWindowBuilder::new(
                 //     "webview window", WebviewUrl::External(url::Url::parse("https://myip.xjtu.app")?)),
                 //         // .proxy_url(Url::parse("socks5://127.0.0.1:4848")?) // may cause white screen
@@ -180,18 +180,18 @@ pub fn run() {
                 let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
                 let menu = Menu::with_items(app, &[&quit_i])?;
                 let tray = TrayIconBuilder::new()
-                        .menu(&menu)
-                        .show_menu_on_left_click(true)
-                        .on_menu_event(|app, event| match event.id.as_ref() {
-                            "quit" => {
-                                println!("quit menu item was clicked");
-                                app.exit(0);
-                            }
-                            _ => {
-                                println!("menu item {:?} not handled", event.id);
-                            }
-                        })
-                        .build(app)?;
+                    .menu(&menu)
+                    .show_menu_on_left_click(true)
+                    .on_menu_event(|app, event| match event.id.as_ref() {
+                        "quit" => {
+                            println!("quit menu item was clicked");
+                            app.exit(0);
+                        }
+                        _ => {
+                            println!("menu item {:?} not handled", event.id);
+                        }
+                    })
+                    .build(app)?;
 
                 Ok(())
             })
