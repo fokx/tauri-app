@@ -1,9 +1,10 @@
 {
   "name": "tauri-app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "type": "module",
   "scripts": {
+	  "install": "pnpm i",
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
@@ -15,7 +16,7 @@
     "tauri-and-init": "tauri android init",
     "tauri-build-apk": "tauri android build --apk --target aarch64",
     "tauri-build-apk-all": "tauri android build --apk",
-    "tauri-build-linux": "tauri build",
+    "tauri-build": "tauri build",
     "tauri-build-win": "pnpm tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc"
   },
   "license": "MIT",

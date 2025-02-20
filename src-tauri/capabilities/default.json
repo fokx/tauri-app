@@ -17,12 +17,7 @@
     "core:menu:default",
     "core:tray:default",
     {
-      "identifier": "fs:allow-write-text-file",
-      "allow": [
-        {
-          "path": "$HOME/test.txt"
-        }
-      ]
+      "identifier": "fs:allow-write-text-file"
     }
   ]
 }

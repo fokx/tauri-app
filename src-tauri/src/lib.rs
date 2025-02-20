@@ -1,8 +1,10 @@
 use network_interface::NetworkInterface;
 use network_interface::NetworkInterfaceConfig;
 use futures::{future, StreamExt};
-use tauri::{Emitter, Manager, Url, WebviewUrl};
+use tauri::{Emitter, Manager, WebviewUrl};
 use tokio;
+
+use tauri::WebviewWindowBuilder;
 
 use sysinfo::{Components, Disks, Networks, System};
 
@@ -17,6 +19,7 @@ use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
 };
+use url::Url;
 
 #[tauri::command]
 fn collect_nic_info() -> String {
@@ -119,7 +122,7 @@ pub fn run() {
     {
         // desktop
         tauri::Builder::default()
-            .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec![]) /* arbitrary number of args to pass to your app */))
+            // .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec![]) /* arbitrary number of args to pass to your app */))
                 .plugin(tauri_plugin_shell::init())
 
             .plugin(tauri_plugin_global_shortcut::Builder::new().build())
@@ -128,7 +131,7 @@ pub fn run() {
                 .plugin(tauri_plugin_http::init())
             .plugin(tauri_plugin_opener::init())
             .setup(|app| {
-
+                /* this shell codeb will cause crash on Windows!
                 let handle = app.handle().clone();
                 let shell = handle.shell();
                 let output = tauri::async_runtime::block_on(async move {
@@ -144,28 +147,35 @@ pub fn run() {
                 } else {
                     println!("Exit with code: {}", output.status.code().unwrap());
                 };
+                 */
 
                 let sidecar_command = app.shell().sidecar("tcc-xapp-mnz").unwrap();
                 let (mut rx, mut _child) = sidecar_command
                         .spawn()
                         .expect("Failed to spawn sidecar");
 
-                let window = app.get_window("main").unwrap();
-                // let _ = window.destroy();
-                let window = tauri::window::WindowBuilder::new(app, "webview").build()?;
-                // let title = Config::get().unwrap().title.unwrap_or("xmen app".to_string());
-                // window.set_title("交大門 Tauri App");
+                // let window = app.get_window("main").unwrap();
+                // // let _ = window.destroy();
+                // let window = tauri::window::WindowBuilder::new(app, "webview").build()?;
+                // // let title = Config::get().unwrap().title.unwrap_or("xmen app".to_string());
+                // // window.set_title("交大門 Tauri App");
+                //
 
+                // let tauri_url = tauri::WebviewUrl::App("index.html".into());
                 let url = Url::parse("https://myip.xjtu.app:443")?;
-                let webview_builder = tauri::webview::WebviewBuilder::new(
-                    "label", WebviewUrl::External(url))
-                        .proxy_url(Url::parse("socks5://127.0.0.1:4848")?) // may cause white screen
-                        ;
-                let webview = window.add_child( // Available on desktop and crate feature unstable only.
-                                                webview_builder,
-                                                tauri::LogicalPosition::new(0, 0),
-                                                window.inner_size().unwrap(),
-                );
+                let tauri_url = WebviewUrl::External(url);
+                let webview_window = tauri::WebviewWindowBuilder::new(app, "label", tauri_url)
+                        .build()?;
+                // WebviewWindowBuilder::new(
+                //     "webview window", WebviewUrl::External(url::Url::parse("https://myip.xjtu.app")?)),
+                //         // .proxy_url(Url::parse("socks5://127.0.0.1:4848")?) // may cause white screen
+                //         .build()?;
+
+                // let webview = window.add_child( // Available on desktop and crate feature unstable only.
+                //                                 webview_builder,
+                //                                 tauri::LogicalPosition::new(0, 0),
+                //                                 window.inner_size().unwrap(),
+                // );
 
                 let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
                 let menu = Menu::with_items(app, &[&quit_i])?;
