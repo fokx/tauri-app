@@ -64,7 +64,12 @@ url = "2.5.4"
 
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 # Mobile target
-tauri = { version = "2", features = ["config-json5", "webview-data-url"] }
+# enableing `rustls-tls` feature can cause build errors on mobile targets
+# /f/tauri-app/src-tauri/target/aarch64-linux-android/debug/build/aws-lc-sys-4faecaa36e7c06c7/out/build/aws-lc/crypto/fipsmodule/curve25519/curve25519_x25519_alt.S.S:5111:14: error: invalid operand
+#     popq %r13
+# I tried `cargo update -p aws-lc-sys` to fix the build error
+tauri = { version = "2", features = ["config-json5", "rustls-tls", "webview-data-url"] }
+#tauri = { version = "2", features = ["config-json5", "webview-data-url"] }
 tauri-plugin-barcode-scanner = "2"
 tauri-plugin-biometric = "2"
 tauri-plugin-nfc = "2"
