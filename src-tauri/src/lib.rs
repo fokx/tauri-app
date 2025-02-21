@@ -160,12 +160,19 @@ pub fn run() {
                 // // let title = Config::get().unwrap().title.unwrap_or("xmen app".to_string());
                 // // window.set_title("交大門 Tauri App");
                 //
-
+                let window = app.get_webview_window("main").unwrap();
+                // window.open_devtools();
                 // let tauri_url = tauri::WebviewUrl::App("index.html".into());
-                let url = Url::parse("https://myip.xjtu.app:443")?;
+                // let url = Url::parse("https://myip.xjtu.app:443")?;
+                let url = Url::parse("https://xjtu.app:443")?;
                 let tauri_url = WebviewUrl::External(url);
                 let webview_window =
-                    tauri::WebviewWindowBuilder::new(app, "label", tauri_url).build()?;
+                    tauri::WebviewWindowBuilder::new(app, "label", tauri_url)
+                            .proxy_url(Url::parse("socks5://127.0.0.1:4848")?)
+                            // .devtools(true)
+                            .build()?;
+                // webview_window.open_devtools();
+
                 // WebviewWindowBuilder::new(
                 //     "webview window", WebviewUrl::External(url::Url::parse("https://myip.xjtu.app")?)),
                 //         // .proxy_url(Url::parse("socks5://127.0.0.1:4848")?) // may cause white screen

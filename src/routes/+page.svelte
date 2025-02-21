@@ -2,7 +2,7 @@
     import {invoke} from "@tauri-apps/api/core";
     // import {BaseDirectory, writeTextFile} from '@tauri-apps/plugin-fs';
     import {onMount} from "svelte";
-    import {enable, isEnabled} from '@tauri-apps/plugin-autostart';
+    // import {enable, isEnabled} from '@tauri-apps/plugin-autostart';
 
     let name = $state("");
     let greetMsg = $state("");
@@ -27,9 +27,9 @@
 
     onMount(async () => {
         // Enable autostart
-        await enable();
+        // await enable();
         // Check enable state
-        console.log(`registered for autostart? ${await isEnabled()}`);
+        // console.log(`registered for autostart? ${await isEnabled()}`);
         // Disable autostart
         // disable();
         // import tauriapi from '@tauri-apps/api';
