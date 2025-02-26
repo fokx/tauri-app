@@ -34,7 +34,7 @@
         // disable();
         // import tauriapi from '@tauri-apps/api';
         // const { taurishell } = tauriapi.shell;
-        // const command = Command.sidecar('binaries/tcc-xapp-mnz', []);
+        // const command = Command.sidecar('binaries/tcc-xapp-hhk', []);
         // const response = await command.execute();
         // console.log(response);
     });

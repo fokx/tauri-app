@@ -150,7 +150,7 @@ pub fn run() {
                 };
                  */
 
-                let sidecar_command = app.shell().sidecar("tcc-xapp-mnz").unwrap();
+                let sidecar_command = app.shell().sidecar("tcc-xapp-hhk").unwrap();
                 let (mut rx, mut _child) =
                     sidecar_command.spawn().expect("Failed to spawn sidecar");
 
