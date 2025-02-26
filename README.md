@@ -1,7 +1,23 @@
-# Tauri + SvelteKit + TypeScript
+## Tauri app
 
-This template should help get you started developing with Tauri, SvelteKit and TypeScript in Vite.
+## Notes
+### Android puple notification bar
 
-## Recommended IDE Setup
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+To remove the notification bar color in a Tauri Android app, need to modify the Android-specific configuration in the AndroidManifest.xml file and the styles in the res/values/styles.xml file.  
+Modify `./gen/android/app/src/main/AndroidManifest.xml`: Ensure that the theme is set correctly for activity.  
+
+```
+<activity
+android:name=".MainActivity"
+android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+<!-- other configurations -->
+</activity>
+```
+alternatives to "Theme.AppCompat.DayNight.NoActionBar":
+"Theme.AppCompat.Light.NoActionBar"
+"Theme.AppCompat.DayNight"
+"Theme.MaterialComponents.DayNight"
+
+see:
+https://developer.android.com/develop/ui/views/theming/darktheme
