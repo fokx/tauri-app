@@ -21,6 +21,21 @@ use tauri::{
 };
 use url::Url;
 
+use std::{env, process};
+use env_logger::Builder as LoggerBuilder;
+
+use crate::{
+    config::{Config, ConfigError},
+    connection::Connection,
+    socks5::Server as Socks5Server,
+};
+
+mod config;
+mod connection;
+mod error;
+mod socks5;
+mod utils;
+
 #[tauri::command]
 fn collect_nic_info() -> String {
     let network_interfaces = NetworkInterface::show().unwrap();
@@ -99,6 +114,44 @@ fn collect_center_server_ip() -> String {
     return result;
 }
 
+async fn tcc_main() {
+    let cfg = match Config::parse(env::args_os()) {
+        Ok(cfg) => cfg,
+        Err(ConfigError::Version(msg) | ConfigError::Help(msg)) => {
+            println!("{msg}");
+            process::exit(0);
+        }
+        Err(err) => {
+            eprintln!("{err}");
+            process::exit(1);
+        }
+    };
+
+    LoggerBuilder::new()
+            .filter_level(cfg.log_level)
+            .format_module_path(false)
+            .format_target(false)
+            .init();
+    rustls::crypto::ring::default_provider().install_default().expect("Failed to install rustls crypto provider");
+    match Connection::set_config(cfg.relay) {
+        Ok(()) => {}
+        Err(err) => {
+            eprintln!("{err}");
+            process::exit(1);
+        }
+    }
+
+    match Socks5Server::set_config(cfg.local) {
+        Ok(()) => {}
+        Err(err) => {
+            eprintln!("{err}");
+            process::exit(1);
+        }
+    }
+
+    Socks5Server::start().await;
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(any(target_os = "android", target_os = "ios"))]
@@ -150,9 +203,12 @@ pub fn run() {
                 };
                  */
 
-                let sidecar_command = app.shell().sidecar("tcc-xapp-hhk").unwrap();
-                let (mut rx, mut _child) =
-                    sidecar_command.spawn().expect("Failed to spawn sidecar");
+                // disable sidecar in favor of implement this in rust code
+                // let sidecar_command = app.shell().sidecar("tcc-xapp-hhk").unwrap();
+                // let (mut rx, mut _child) =
+                //     sidecar_command.spawn().expect("Failed to spawn sidecar");
+
+                tauri::async_runtime::spawn(tcc_main());
 
                 // let window = app.get_window("main").unwrap();
                 // // let _ = window.destroy();

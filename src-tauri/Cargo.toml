@@ -1,11 +1,19 @@
 [package]
 name = "tauri-app"
-version = "0.1.5"
+version = "0.1.6"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# enable this will lead to smaller exe size, e.g. 4.4MiB vs 6.2MiB
+#[profile.release]
+#lto = true
+#strip = true
+#codegen-units = 1
+#panic = "abort"
+
 
 [lib]
 # The `_lib` suffix may seem redundant but it is necessary
@@ -58,10 +66,10 @@ dotenvy = "0.15.7"
 dotenvy_macro = "0.15.7"
 url = "2.5.4"
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
-#socks5-proto = { path = "../../socks5-server/socks5-proto", default-features = false }
-#socks5-server = { path = "../../socks5-server/socks5-server", default-features = false }
-#tuic = { path = "../../tuic/tuic", default-features = false }
-#tuic-quinn = { path = "../../tuic/tuic-quinn" }
+socks5-proto = { path = "../../socks5-server/socks5-proto", default-features = false }
+socks5-server = { path = "../../socks5-server/socks5-server", default-features = false }
+tuic = { path = "../../tuic/tuic", default-features = false }
+tuic-quinn = { path = "../../tuic/tuic-quinn" }
 
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 # Mobile target

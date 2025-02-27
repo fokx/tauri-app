@@ -4576,6 +4576,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "socks5-proto"
+version = "0.4.2"
+dependencies = [
+ "bytes",
+ "thiserror 2.0.11",
+ "tokio",
+]
+
+[[package]]
+name = "socks5-server"
+version = "0.10.2"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "socks5-proto",
+ "tokio",
+]
+
+[[package]]
 name = "softbuffer"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5128,6 +5147,8 @@ dependencies = [
  "serde",
  "serde_json",
  "socket2",
+ "socks5-proto",
+ "socks5-server",
  "sysinfo",
  "tauri",
  "tauri-build",
@@ -5145,6 +5166,8 @@ dependencies = [
  "thiserror 2.0.11",
  "tokio",
  "tokio-util",
+ "tuic",
+ "tuic-quinn",
  "url",
  "uuid",
 ]
@@ -5889,6 +5912,30 @@ name = "try-lock"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
+
+[[package]]
+name = "tuic"
+version = "5.0.0"
+dependencies = [
+ "bytes",
+ "futures-util",
+ "parking_lot",
+ "register-count",
+ "thiserror 2.0.11",
+ "uuid",
+]
+
+[[package]]
+name = "tuic-quinn"
+version = "0.1.0"
+dependencies = [
+ "bytes",
+ "futures-util",
+ "quinn",
+ "thiserror 2.0.11",
+ "tuic",
+ "uuid",
+]
 
 [[package]]
 name = "typeid"
