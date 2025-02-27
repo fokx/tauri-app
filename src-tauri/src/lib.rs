@@ -36,6 +36,7 @@ mod error;
 mod socks5;
 mod utils;
 
+// use futures::executor::block_on;
 #[tauri::command]
 fn collect_nic_info() -> String {
     let network_interfaces = NetworkInterface::show().unwrap();
@@ -166,7 +167,11 @@ pub fn run() {
             .plugin(tauri_plugin_sql::Builder::new().build())
             .plugin(tauri_plugin_http::init())
             .plugin(tauri_plugin_opener::init())
-            .setup(|app| Ok(()))
+            .setup(|app| {
+                // std::thread::spawn(move || block_on(tcc_main()));
+                tauri::async_runtime::spawn(tcc_main());
+                Ok(())
+            })
             .invoke_handler(tauri::generate_handler![greet, collect_nic_info])
             .run(tauri::generate_context!())
             .expect("error while running tauri application");
@@ -208,6 +213,7 @@ pub fn run() {
                 // let (mut rx, mut _child) =
                 //     sidecar_command.spawn().expect("Failed to spawn sidecar");
 
+                // std::thread::spawn(move || block_on(tcc_main()));
                 tauri::async_runtime::spawn(tcc_main());
 
                 // let window = app.get_window("main").unwrap();

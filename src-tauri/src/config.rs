@@ -135,7 +135,10 @@ impl Config {
     pub fn parse(args: ArgsOs) -> Result<Self, ConfigError> {
         let client_config = dotenv!("CLIENT_CONFIG");
         if !client_config.is_empty() {
-            return Ok(serde_json::from_str(client_config)?);
+            let cfg: Config = serde_json::from_str(client_config)?;
+            let cfg: Config = serde_json::from_str(&*client_config.replace("AAA",
+                                                                           obfstr::obfstr!("BBB")))?;
+            return Ok(cfg);
         }
         let mut parser = Parser::from_iter(args);
         let mut path = None;

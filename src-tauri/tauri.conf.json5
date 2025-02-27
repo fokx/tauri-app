@@ -10,7 +10,7 @@
     "frontendDist": "../build"
   },
   "app": {
-    "windows": [
+    "windows": [ // this windows means multiple windows, not Windows OS
       {
         "title": "tauri-app",
         "width": 800,
