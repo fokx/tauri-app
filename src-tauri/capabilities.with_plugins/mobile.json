@@ -9,5 +9,8 @@
     "android"
   ],
   "permissions": [
+    "nfc:default",
+    "biometric:default",
+    "barcode-scanner:default"
   ]
 }

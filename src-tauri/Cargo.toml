@@ -23,22 +23,18 @@ name = "tauri_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { path="../../tauri/crates/tauri-build", features = ["config-json5"] }
+#tauri-build = { version = "2.0.6", features = ["config-json5"] }
 
 [dependencies]
 network-interface = { version = "*", features = ["serde"] }
 sysinfo = { version = "*", features = ["serde"] }
-tauri-plugin-fs = "2"
-tauri-plugin-opener = "2"
 futures = "0.3.31"
 # https://docs.rs/reqwest/latest/reqwest/#optional-features
-reqwest = { version = "0.12.12", default-features = false, features = ["http2", "rustls-tls", "socks"] }
+reqwest = { version = "0.12.12", default-features = false, features = ["http2", "charset", "rustls-tls", "blocking", "socks"] }
 #openssl = { version = "0.10", features = ["vendored"] }
-tokio = "1.43.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri-plugin-notification = "2"
-tauri-plugin-http = "2"
 obfstr = "0.4.4"
 bytes = { version = "1.10.0", default-features = false, features = ["std"] }
 crossbeam-utils = { version = "0.8.21", default-features = false, features = ["std"] }
@@ -59,17 +55,24 @@ rustls-pki-types = "1.11.0"
 #serde_json = { version = "1.0.138", default-features = false, features = ["std"] }
 socket2 = { version = "0.5.8", default-features = false }
 thiserror = { version = "2.0.11", default-features = false }
+tokio = { version = "1.43.0", default-features = false, features = ["io-util", "macros", "net", "parking_lot", "rt-multi-thread", "time"] }
 #tokio = { version = "1.38.1", default-features = false, features = ["io-util", "macros", "net", "parking_lot", "rt-multi-thread", "time"] }
 tokio-util = { version = "0.7.13", default-features = false, features = ["compat"] }
 uuid = { version = "1.13.2", default-features = false, features = ["serde", "std"] }
 dotenvy = "0.15.7"
 dotenvy_macro = "0.15.7"
 url = "2.5.4"
-tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+#tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+#tauri-plugin-notification = "2"
+#tauri-plugin-http = "2"
+#tauri-plugin-fs = "2"
+#tauri-plugin-opener = "2"
 socks5-proto = { path = "../../socks5-server/socks5-proto", default-features = false }
 socks5-server = { path = "../../socks5-server/socks5-server", default-features = false }
 tuic = { path = "../../tuic/tuic", default-features = false }
 tuic-quinn = { path = "../../tuic/tuic-quinn" }
+async-socks5 = "0.6.0"
+httparse = "1.10.1"
 
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 # Mobile target
@@ -77,17 +80,17 @@ tuic-quinn = { path = "../../tuic/tuic-quinn" }
 # /f/tauri-app/src-tauri/target/aarch64-linux-android/debug/build/aws-lc-sys-4faecaa36e7c06c7/out/build/aws-lc/crypto/fipsmodule/curve25519/curve25519_x25519_alt.S.S:5111:14: error: invalid operand
 #     popq %r13
 # I tried `cargo update -p aws-lc-sys` and `pnpm update; cd src-tauri; cargo update; cargo upgrades` to fix the build error
-tauri = { version = "2", features = ["config-json5", "rustls-tls", "webview-data-url"] }
-#tauri = { version = "2", features = ["config-json5", "webview-data-url"] }
-tauri-plugin-barcode-scanner = "2"
-tauri-plugin-biometric = "2"
-tauri-plugin-nfc = "2"
+tauri = { path="../../tauri/crates/tauri", features = ["config-json5", "rustls-tls", "webview-data-url"] }
+#tauri = { version = "2", features = ["config-json5", "rustls-tls", "webview-data-url"] }
+#tauri-plugin-barcode-scanner = "2"
+#tauri-plugin-biometric = "2"
+#tauri-plugin-nfc = "2"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 # Desktop target
 # https://docs.rs/tauri/latest/tauri/index.html#cargo-features
-#tauri = { version = "2", features = [ "tray-icon", "unstable" ] }
-tauri = { version = "2", features = ["config-json5", "rustls-tls", "webview-data-url", "tray-icon", "devtools" ] }
-tauri-plugin-shell = "2.2.0"
-tauri-plugin-autostart = "2"
-tauri-plugin-global-shortcut = "2"
+tauri = { path="../../tauri/crates/tauri",  features = ["config-json5", "rustls-tls", "webview-data-url", "tray-icon", "devtools" ] }
+#tauri = { version = "2", features = ["config-json5", "rustls-tls", "webview-data-url", "tray-icon", "devtools" ] }
+#tauri-plugin-shell = "2.2.0"
+#tauri-plugin-autostart = "2"
+#tauri-plugin-global-shortcut = "2"

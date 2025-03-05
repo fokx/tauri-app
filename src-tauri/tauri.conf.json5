@@ -16,8 +16,11 @@
         "width": 800,
         "height": 800,
         // https://v2.tauri.app/reference/config/#windowconfig
-        "proxyUrl": "socks5://127.0.0.1:4848",
-        "url": "https://xjtu.app"
+        "proxyUrl": "socks5://127.0.0.1:4801",
+//        "url": "https://bgp.he.net",
+//        "url": "https://myip.xjtu.app",
+//        "url": "https://xjtu.app",
+        "url": "http://127.0.0.1:4802"
       }
     ],
     "security": {
