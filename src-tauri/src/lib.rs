@@ -33,7 +33,7 @@ mod error;
 mod socks5;
 mod utils;
 
-const REQ_HOST: &str = "static.xjtu.app";
+const REQ_HOST: &str = "xjtu.app";
 const REQ_PORT: u16 = 443;
 // use futures::executor::block_on;
 #[tauri::command]
@@ -158,7 +158,20 @@ async fn socks2http() {
     let listener = TcpListener::bind(format!("127.0.0.1:{:?}", 4802))
         .await
         .unwrap();
+    let socks5_url = reqwest::Url::parse(
+        &*format!("socks5h://127.0.0.1:{:?}", 4801).to_string(),
+    )
+            .unwrap();
+    let client = reqwest::Client::builder()
+            .proxy(reqwest::Proxy::all(socks5_url).unwrap())
+            .cookie_store(true)
+            .use_rustls_tls()
+            .tls_sni(true)
+            .tls_info(true)
+            .build()
+            .unwrap();
     loop {
+        let client = client.clone();
         let (mut inbound, addr) = listener.accept().await.unwrap();
         println!("NEW CLIENT: {}", addr);
 
@@ -188,7 +201,7 @@ async fn socks2http() {
                         .unwrap();
                     println!("proxy server connected to {}", REQ_HOST);
                     dbg!(req.method.unwrap());
-                    if req.method.unwrap() == Method::CONNECT {
+                    if req.method.unwrap() == Method::CONNECT { // HTTPS proxy use CONNECT command
                         inbound
                             .write_all(b"HTTP/1.1 200 Connection Established\r\n\r\n")
                             .await
@@ -210,18 +223,7 @@ async fn socks2http() {
                         println!("try join");
                         let _ = futures::future::try_join(client_to_server, server_to_client).await;
                     } else {
-                        let socks5_url = reqwest::Url::parse(
-                            &*format!("socks5h://127.0.0.1:{:?}", 4801).to_string(),
-                        )
-                        .unwrap();
-                        let client = reqwest::Client::builder()
-                            .proxy(reqwest::Proxy::all(socks5_url).unwrap())
 
-                                .use_rustls_tls()
-                                .tls_sni(true)
-                                .tls_info(true)
-                                .build()
-                                .unwrap();
                         let req_url = format!("https://{}{}", REQ_HOST, valid_req_path);
                         println!("reqwest client built with SOCKS5 to {}", req_url);
                         // let response = client.get(req_url).send().await.unwrap();
